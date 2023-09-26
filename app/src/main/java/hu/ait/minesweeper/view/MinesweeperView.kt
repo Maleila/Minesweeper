@@ -39,16 +39,12 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
         // border
         canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paintLine)
         // two horizontal lines
-        canvas?.drawLine(0f, (height / 3).toFloat(), width.toFloat(), (height / 3).toFloat(),
-            paintLine)
-        canvas?.drawLine(0f, (2 * height / 3).toFloat(), width.toFloat(),
-            (2 * height / 3).toFloat(), paintLine)
-
-        // two vertical lines
-        canvas?.drawLine((width / 3).toFloat(), 0f, (width / 3).toFloat(), height.toFloat(),
-            paintLine)
-        canvas?.drawLine((2 * width / 3).toFloat(), 0f, (2 * width / 3).toFloat(), height.toFloat(),
-            paintLine)
+        for(i in 1..4) {
+            canvas?.drawLine(0f, (i * height / 5).toFloat(), width.toFloat(), (i * height / 5).toFloat(),
+                paintLine)
+            canvas?.drawLine((i * width / 5).toFloat(), 0f, (i * width / 5).toFloat(), height.toFloat(),
+                paintLine)
+        }
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
