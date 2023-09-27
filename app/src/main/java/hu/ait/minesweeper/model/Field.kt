@@ -18,5 +18,7 @@ data class Field(var type: Int, var minesAround: Int, var isFlagged: Boolean, va
         showsNumber = true
     }
 
-
+    fun flag() {
+        isFlagged = true
+    }
 }

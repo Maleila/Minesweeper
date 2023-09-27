@@ -18,5 +18,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun isFlagModeOn() : Boolean {
+        return binding.cbFlagMode.isChecked
+    }
 
 }

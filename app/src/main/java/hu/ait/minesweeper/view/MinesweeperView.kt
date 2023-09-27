@@ -9,6 +9,7 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import hu.ait.minesweeper.MainActivity
 import hu.ait.minesweeper.R
 import hu.ait.minesweeper.model.MinesweeperModel
 
@@ -18,6 +19,7 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
     private var paintLine = Paint()
     private var bitmapImg = BitmapFactory.decodeResource(resources, R.drawable.skateboardd)
     private val paintText = Paint()
+
 
     init{
         paintBackground.color = Color.BLACK
@@ -49,6 +51,7 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
         drawMine(canvas)
     }
 
+    //rename this
     fun drawMine(canvas: Canvas?) {
         for (i in 0..4) { //go back and change this later so it's not hard-coded
             for (j in 0..4) {
@@ -60,6 +63,8 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
                 } else if(MinesweeperModel.getField(i, j).showsNumber && !MinesweeperModel.getField(i, j).wasClicked) {
                     var num = MinesweeperModel.getField(i, j).minesAround
                     canvas?.drawText("$num", i*height/5f, (j+1)*width/5f, paintText)
+                } else if(MinesweeperModel.getField(i, j).isFlagged) {
+                    canvas?.drawText("F", i*height/5f, (j+1)*width/5f, paintText)
                 }
             }
 
@@ -83,9 +88,15 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
             val tX = event.x.toInt() / (width / 5)
             val tY = event.y.toInt() / (height / 5)
 
-            if(MinesweeperModel.testSquare(tX, tY)) {
-                //set message
+            if ((context as MainActivity).isFlagModeOn()) {
+                MinesweeperModel.flag(tX, tY)
+            } else {
+                if(MinesweeperModel.testSquare(tX, tY)) {
+                    //set message
+                }
             }
+
+
         }
         print("touch event!")
         invalidate()

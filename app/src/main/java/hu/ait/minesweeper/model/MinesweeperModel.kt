@@ -118,4 +118,7 @@ object MinesweeperModel {
         return fieldMatrix[r][c]
     }
 
+    fun flag(r: Int, c: Int) {
+        fieldMatrix[r][c].flag()
+    }
 }
