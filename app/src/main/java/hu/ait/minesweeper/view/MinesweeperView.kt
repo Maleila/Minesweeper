@@ -1,17 +1,23 @@
 package hu.ait.minesweeper.view
 
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import hu.ait.minesweeper.R
+import hu.ait.minesweeper.model.MinesweeperModel
 
 class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, attrs) {
 
     private var paintBackground = Paint()
     private var paintLine = Paint()
+    private var bitmapImg = BitmapFactory.decodeResource(resources, R.drawable.skateboardd)
+    private val paintText = Paint()
 
     init{
         paintBackground.color = Color.BLACK
@@ -20,11 +26,17 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
         paintLine.color = Color.WHITE
         paintLine.style = Paint.Style.STROKE
         paintLine.strokeWidth = 5f
+
+        paintText.color = Color.GREEN
+        paintText.textSize = 100f
     }
 
     //what does this actually do...
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
+
+        bitmapImg = Bitmap.createScaledBitmap(bitmapImg, w/5, h/5, false)
+        paintText.textSize = h / 5f
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -33,6 +45,25 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
         canvas?.drawRect(0f, 0f, width.toFloat(), height.toFloat(), paintBackground)
 
         drawBoard(canvas)
+
+        drawMine(canvas)
+    }
+
+    fun drawMine(canvas: Canvas?) {
+        for (i in 0..4) { //go back and change this later so it's not hard-coded
+            for (j in 0..4) {
+                if (MinesweeperModel.getField(i, j).type == MinesweeperModel.MINE && MinesweeperModel.getField(i, j).wasClicked) {
+                    canvas?.drawBitmap(bitmapImg, i*height/5f, j*width/5f, null)
+                } else if(MinesweeperModel.getField(i, j).type == MinesweeperModel.CLEAR && MinesweeperModel.getField(i, j).wasClicked){
+                    //show something
+                    canvas?.drawText("!", i*height/5f, (j+1)*width/5f, paintText)
+                } else if(MinesweeperModel.getField(i, j).showsNumber && !MinesweeperModel.getField(i, j).wasClicked) {
+                    var num = MinesweeperModel.getField(i, j).minesAround
+                    canvas?.drawText("$num", i*height/5f, (j+1)*width/5f, paintText)
+                }
+            }
+
+        }
     }
 
     private fun drawBoard(canvas: Canvas?) {
@@ -49,10 +80,15 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         if (event.action == MotionEvent.ACTION_DOWN) {
-            val tX = event.x.toInt() / (width / 3)
-            val tY = event.y.toInt() / (height / 3)
+            val tX = event.x.toInt() / (width / 5)
+            val tY = event.y.toInt() / (height / 5)
+
+            if(MinesweeperModel.testSquare(tX, tY)) {
+                //set message
+            }
         }
         print("touch event!")
+        invalidate()
         return true
     }
 
@@ -64,4 +100,8 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
         setMeasuredDimension(d, d)
     }
 
+    fun resetGame() {
+        MinesweeperModel.resetModel()
+        invalidate()
+    }
 }
