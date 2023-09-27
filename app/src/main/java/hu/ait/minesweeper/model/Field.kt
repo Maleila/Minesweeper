@@ -1,6 +1,6 @@
 package hu.ait.minesweeper.model
 
-data class Field(var type: Int, var minesAround: Int, var isFlagged: Boolean, var wasClicked: Boolean, var showsNumber: Boolean) {
+data class Field(var type: Int, var minesAround: Int, var isFlagged: Boolean, var wasClicked: Boolean) {
 //are these all public? do I even need the getters...
     fun addMineNearby() {
         minesAround++
@@ -10,12 +10,9 @@ data class Field(var type: Int, var minesAround: Int, var isFlagged: Boolean, va
         type = newType
     }
 
+    //maybe I don't need a parameter for this... like it only goes one way right...
     fun setClicked(clicked: Boolean) {
         wasClicked = clicked
-    }
-
-    fun showNumber() {
-        showsNumber = true
     }
 
     fun flag() {

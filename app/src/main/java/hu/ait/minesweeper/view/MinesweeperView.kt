@@ -58,9 +58,6 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
                 if (MinesweeperModel.getField(i, j).type == MinesweeperModel.MINE && MinesweeperModel.getField(i, j).wasClicked) {
                     canvas?.drawBitmap(bitmapImg, i*height/5f, j*width/5f, null)
                 } else if(MinesweeperModel.getField(i, j).type == MinesweeperModel.CLEAR && MinesweeperModel.getField(i, j).wasClicked){
-                    //show something
-                    canvas?.drawText("!", i*height/5f, (j+1)*width/5f, paintText)
-                } else if(MinesweeperModel.getField(i, j).showsNumber && !MinesweeperModel.getField(i, j).wasClicked) {
                     var num = MinesweeperModel.getField(i, j).minesAround
                     canvas?.drawText("$num", i*height/5f, (j+1)*width/5f, paintText)
                 } else if(MinesweeperModel.getField(i, j).isFlagged) {
@@ -89,10 +86,12 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
             val tY = event.y.toInt() / (height / 5)
 
             if ((context as MainActivity).isFlagModeOn()) {
-                MinesweeperModel.flag(tX, tY)
+                if(!MinesweeperModel.flag(tX, tY)) {
+                    loseGame()
+                }
             } else {
                 if(MinesweeperModel.testSquare(tX, tY)) {
-                    //set message
+                    loseGame()
                 }
             }
 
@@ -114,5 +113,13 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
     fun resetGame() {
         MinesweeperModel.resetModel()
         invalidate()
+        //probably want to have it uncheck the checkbox but idk how to do that
+    }
+
+    private fun loseGame() {
+        for(i in 0..3) {
+            MinesweeperModel.getField(MinesweeperModel.minesList[i][0], MinesweeperModel.minesList[i][1]).setClicked(true)
+        }
+        (context as MainActivity).setMessage("Game over!")
     }
 }

@@ -22,4 +22,8 @@ class MainActivity : AppCompatActivity() {
         return binding.cbFlagMode.isChecked
     }
 
+    fun setMessage(message: String) {
+        binding.msg.text = message
+    }
+
 }
