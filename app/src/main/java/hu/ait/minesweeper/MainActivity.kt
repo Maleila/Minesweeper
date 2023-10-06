@@ -26,4 +26,8 @@ class MainActivity : AppCompatActivity() {
         binding.msg.text = message
     }
 
+    fun resetCB() {
+        binding.cbFlagMode.isChecked = false
+    }
+
 }

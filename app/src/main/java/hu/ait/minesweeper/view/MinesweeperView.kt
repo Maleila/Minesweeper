@@ -19,6 +19,7 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
     private var paintLine = Paint()
     private var bitmapImg = BitmapFactory.decodeResource(resources, R.drawable.skateboardd)
     private val paintText = Paint()
+    private var lock = false
 
 
     init{
@@ -81,7 +82,7 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        if (event.action == MotionEvent.ACTION_DOWN) {
+        if (event.action == MotionEvent.ACTION_DOWN && !lock) {
             val tX = event.x.toInt() / (width / 5)
             val tY = event.y.toInt() / (height / 5)
 
@@ -94,10 +95,10 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
                     loseGame()
                 }
             }
-
-
+            if(MinesweeperModel.checkWin()) {
+                winGame()
+            }
         }
-        print("touch event!")
         invalidate()
         return true
     }
@@ -112,14 +113,22 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
 
     fun resetGame() {
         MinesweeperModel.resetModel()
+        (context as MainActivity).setMessage("Minesweeper time")
+        (context as MainActivity).resetCB()
+        lock = false
         invalidate()
-        //probably want to have it uncheck the checkbox but idk how to do that
     }
 
     private fun loseGame() {
         for(i in 0..3) {
             MinesweeperModel.getField(MinesweeperModel.minesList[i][0], MinesweeperModel.minesList[i][1]).setClicked(true)
         }
+        lock = true
         (context as MainActivity).setMessage("Game over!")
+    }
+
+    private fun winGame() {
+        lock = true
+        (context as MainActivity).setMessage("You win!")
     }
 }

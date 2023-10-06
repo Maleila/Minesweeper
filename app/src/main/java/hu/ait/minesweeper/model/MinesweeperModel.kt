@@ -17,6 +17,7 @@ object MinesweeperModel {
     )
 
     val minesList: Array<Array<Int>> = arrayOf(arrayOf(0, 0), arrayOf(0, 0), arrayOf(0, 0), arrayOf(0, 0))
+    private var notMines = 0
 
     init {
         resetModel()
@@ -40,6 +41,8 @@ object MinesweeperModel {
             minesList[i] = arrayOf(r, c)
             //MinesweeperView.drawMine(r, c)
         }
+        notMines = fieldMatrix.size* fieldMatrix[0].size - minesList.size
+        println(notMines)
     }
 
     fun updateNeighbors(r: Int, c: Int) {
@@ -80,9 +83,20 @@ object MinesweeperModel {
         if(fieldMatrix[r][c].type == MINE) {
             return true
         } else {
-            //do... something? maybe not
+            notMines --
             return false
         }
+    }
+
+    fun checkWin(): Boolean {
+        if(notMines == 0) //if there are still untried clear squares, return false
+            return true
+        for(m in minesList) { //if there are still undiscovered mines, return false
+            if(!fieldMatrix[m[0]][m[1]].isFlagged) {
+                return false
+            }
+        }
+        return true
     }
 
     //not sure if this is how I wanna do it -- seems like iffy encapsulation
@@ -92,10 +106,8 @@ object MinesweeperModel {
 
     fun flag(r: Int, c: Int): Boolean {
         fieldMatrix[r][c].flag()
-        if(fieldMatrix[r][c].type == MINE) {
+        if(fieldMatrix[r][c].type == MINE)
             return true
-        } else {
-            return false
-        }
+        return false
     }
 }
