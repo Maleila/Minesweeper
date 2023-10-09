@@ -9,6 +9,7 @@ import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import android.widget.Toast
 import hu.ait.minesweeper.MainActivity
 import hu.ait.minesweeper.R
 import hu.ait.minesweeper.model.MinesweeperModel
@@ -17,7 +18,8 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
 
     private var paintBackground = Paint()
     private var paintLine = Paint()
-    private var bitmapImg = BitmapFactory.decodeResource(resources, R.drawable.skateboardd)
+    private var bitmapImg = BitmapFactory.decodeResource(resources, R.drawable.mine)
+    private var bitmapFlag = BitmapFactory.decodeResource(resources, R.drawable.flag)
     private val paintText = Paint()
     private var lock = false
 
@@ -34,11 +36,11 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
         paintText.textSize = 100f
     }
 
-    //what does this actually do...
     override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
         super.onSizeChanged(w, h, oldw, oldh)
 
         bitmapImg = Bitmap.createScaledBitmap(bitmapImg, w/5, h/5, false)
+        bitmapFlag = Bitmap.createScaledBitmap(bitmapFlag, w/5, h/5, false)
         paintText.textSize = h / 5f
     }
 
@@ -59,14 +61,21 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
                 if (MinesweeperModel.getField(i, j).type == MinesweeperModel.MINE && MinesweeperModel.getField(i, j).wasClicked) {
                     canvas?.drawBitmap(bitmapImg, i*height/5f, j*width/5f, null)
                 } else if(MinesweeperModel.getField(i, j).type == MinesweeperModel.CLEAR && MinesweeperModel.getField(i, j).wasClicked){
-                    var num = MinesweeperModel.getField(i, j).minesAround
-                    canvas?.drawText("$num", i*height/5f, (j+1)*width/5f, paintText)
+                    centerNumber(canvas, i, j)
+                //var num = MinesweeperModel.getField(i, j).minesAround
+                    //canvas?.drawText("$num", i*height/5f, (j+1)*width/5f, paintText)
                 } else if(MinesweeperModel.getField(i, j).isFlagged) {
-                    canvas?.drawText("F", i*height/5f, (j+1)*width/5f, paintText)
+                    canvas?.drawBitmap(bitmapFlag, i*height/5f, j*width/5f, null)
                 }
             }
-
         }
+    }
+
+    fun centerNumber(canvas: Canvas?, i: Int, j: Int) {
+        var num = MinesweeperModel.getField(i, j).minesAround
+        val offsetY = (height/5f - (paintText.ascent() + paintText.descent()))/2f
+        val offsetX = (width/5f - paintText.measureText("$num"))/2f
+        canvas?.drawText("$num", offsetX + i*height/5f, offsetY + (j*width/5f), paintText)
     }
 
     private fun drawBoard(canvas: Canvas?) {
@@ -103,7 +112,6 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
         return true
     }
 
-    //what does this do exactly...
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val w = View.MeasureSpec.getSize(widthMeasureSpec)
         val h = View.MeasureSpec.getSize(heightMeasureSpec)
@@ -113,22 +121,26 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
 
     fun resetGame() {
         MinesweeperModel.resetModel()
-        (context as MainActivity).setMessage("Minesweeper time")
         (context as MainActivity).resetCB()
         lock = false
+        (context as MainActivity).resetTimer()
         invalidate()
     }
 
     private fun loseGame() {
-        for(i in 0..3) {
+        for(i in 0..3) { //change this so it's not hard-coded
             MinesweeperModel.getField(MinesweeperModel.minesList[i][0], MinesweeperModel.minesList[i][1]).setClicked(true)
         }
         lock = true
-        (context as MainActivity).setMessage("Game over!")
+        (context as MainActivity).stopTimer()
+        Toast.makeText((context as MainActivity),
+            context.getString(R.string.text_lose), Toast.LENGTH_SHORT).show()
     }
 
     private fun winGame() {
         lock = true
-        (context as MainActivity).setMessage("You win!")
+        (context as MainActivity).stopTimer()
+        Toast.makeText((context as MainActivity),
+            context.getString(R.string.text_win), Toast.LENGTH_SHORT).show()
     }
 }

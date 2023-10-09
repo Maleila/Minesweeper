@@ -1,7 +1,5 @@
 package hu.ait.minesweeper.model
 
-import hu.ait.minesweeper.view.MinesweeperView
-
 object MinesweeperModel {
 
     public val CLEAR: Int = 0
@@ -17,6 +15,7 @@ object MinesweeperModel {
     )
 
     val minesList: Array<Array<Int>> = arrayOf(arrayOf(0, 0), arrayOf(0, 0), arrayOf(0, 0), arrayOf(0, 0))
+    private var mines = 3
     private var notMines = 0
 
     init {
@@ -30,19 +29,14 @@ object MinesweeperModel {
                 fieldMatrix[i][j] = Field(CLEAR, 0, false, false)
             }
         }
-        //add mines (number of mines should probably be modifiable later)
-        for(i in 0..3) {
-//            var r = (0..4).random()
-//            var c = (0..4).random()
-            var r = i
-            var c = i
+        for(i in 0..mines) {
+            var r = (0..fieldMatrix.size - 1).random()
+            var c = (0..fieldMatrix[0].size - 1).random()
             fieldMatrix[r][c].changeType(MINE)
             updateNeighbors(r, c)
             minesList[i] = arrayOf(r, c)
-            //MinesweeperView.drawMine(r, c)
         }
-        notMines = fieldMatrix.size* fieldMatrix[0].size - minesList.size
-        println(notMines)
+        notMines = fieldMatrix.size* fieldMatrix[0].size - mines
     }
 
     fun updateNeighbors(r: Int, c: Int) {
@@ -89,7 +83,7 @@ object MinesweeperModel {
     }
 
     fun checkWin(): Boolean {
-        if(notMines == 0) //if there are still untried clear squares, return false
+        if(notMines == 0) //if all the CLEAR squares have been checked, return true
             return true
         for(m in minesList) { //if there are still undiscovered mines, return false
             if(!fieldMatrix[m[0]][m[1]].isFlagged) {
@@ -99,7 +93,6 @@ object MinesweeperModel {
         return true
     }
 
-    //not sure if this is how I wanna do it -- seems like iffy encapsulation
     fun getField(r: Int, c: Int): Field {
         return fieldMatrix[r][c]
     }

@@ -3,6 +3,7 @@ package hu.ait.minesweeper
 import androidx.appcompat.app.AppCompatActivity
 import hu.ait.minesweeper.databinding.ActivityMainBinding
 import android.os.Bundle
+import android.os.SystemClock
 
 class MainActivity : AppCompatActivity() {
 
@@ -13,6 +14,8 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        resetTimer()
+
         binding.resetbtn.setOnClickListener() {
             binding.minesweeper.resetGame()
         }
@@ -22,12 +25,17 @@ class MainActivity : AppCompatActivity() {
         return binding.cbFlagMode.isChecked
     }
 
-    fun setMessage(message: String) {
-        binding.msg.text = message
-    }
-
     fun resetCB() {
         binding.cbFlagMode.isChecked = false
+    }
+
+    fun resetTimer() {
+        binding.timer.setBase(SystemClock.elapsedRealtime())
+        binding.timer.start()
+    }
+
+    fun stopTimer() {
+        binding.timer.stop()
     }
 
 }

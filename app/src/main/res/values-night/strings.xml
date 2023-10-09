@@ -1,8 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Minesweeper</string>
     <string name="text_title">MINESWEEPER</string>
     <string name="text_lose">Game over!</string>
     <string name="text_win">You win!</string>
-    <string name="text_reset">reset</string>
-    <string name="text_flag_mode">Flag mode</string>
 </resources>
