@@ -2,11 +2,10 @@ package hu.ait.minesweeper.model
 
 object MinesweeperModel {
 
-    public val CLEAR: Int = 0
-    public val MINE: Int = 1
+    val CLEAR: Int = 0
+    val MINE: Int = 1
 
-    //should probably put this in a loop later...
-    val fieldMatrix: Array<Array<Field>> = arrayOf(
+    private val fieldMatrix: Array<Array<Field>> = arrayOf(
         arrayOf(Field(CLEAR, 0, false, false), Field(CLEAR, 0, false, false), Field(CLEAR, 0, false, false), Field(CLEAR, 0, false, false), Field(CLEAR, 0, false, false)),
         arrayOf(Field(CLEAR, 0, false, false), Field(CLEAR, 0, false, false), Field(CLEAR, 0, false, false), Field(CLEAR, 0, false, false), Field(CLEAR, 0, false, false)),
         arrayOf(Field(CLEAR, 0, false, false), Field(CLEAR, 0, false, false), Field(CLEAR, 0, false, false), Field(CLEAR, 0, false, false), Field(CLEAR, 0, false, false)),
@@ -14,8 +13,8 @@ object MinesweeperModel {
         arrayOf(Field(CLEAR, 0, false, false), Field(CLEAR, 0, false, false), Field(CLEAR, 0, false, false), Field(CLEAR, 0, false, false), Field(CLEAR, 0, false, false)),
     )
 
-    val minesList: Array<Array<Int>> = arrayOf(arrayOf(0, 0), arrayOf(0, 0), arrayOf(0, 0), arrayOf(0, 0))
-    private var mines = 3
+    var minesList: MutableList<MutableList<Int>> = mutableListOf(mutableListOf(0, 0))
+    private val mines = 3
     private var notMines = 0
 
     init {
@@ -29,17 +28,26 @@ object MinesweeperModel {
                 fieldMatrix[i][j] = Field(CLEAR, 0, false, false)
             }
         }
-        for(i in 0..mines) {
-            var r = (0..fieldMatrix.size - 1).random()
-            var c = (0..fieldMatrix[0].size - 1).random()
-            fieldMatrix[r][c].changeType(MINE)
-            updateNeighbors(r, c)
-            minesList[i] = arrayOf(r, c)
-        }
-        notMines = fieldMatrix.size* fieldMatrix[0].size - mines
+        createMines()
     }
 
-    fun updateNeighbors(r: Int, c: Int) {
+    private fun createMines() {
+        minesList.clear()
+        var r: Int
+        var c: Int
+        for(i in 0..mines - 1) {
+            do {
+                r = (0..fieldMatrix.size - 1).random()
+                c = (0..fieldMatrix[0].size - 1).random()
+            } while(minesList.contains(listOf(r,c)))
+            fieldMatrix[r][c].changeType(MINE)
+            updateNeighbors(r, c)
+            minesList.add(i, mutableListOf(r, c))
+        }
+        notMines = fieldMatrix.size* fieldMatrix[0].size - minesList.size
+    }
+
+    private fun updateNeighbors(r: Int, c: Int) {
         var up = r > 0
         var down = r < fieldMatrix.size - 1
         var right = c < fieldMatrix[r].size - 1
@@ -71,9 +79,8 @@ object MinesweeperModel {
         }
     }
 
-    //rename this I keep forgetting what true/false means
-    fun testSquare(r: Int, c: Int): Boolean {
-        fieldMatrix[r][c].setClicked(true)
+    fun testMine(r: Int, c: Int): Boolean {
+        fieldMatrix[r][c].setClicked()
         if(fieldMatrix[r][c].type == MINE) {
             return true
         } else {

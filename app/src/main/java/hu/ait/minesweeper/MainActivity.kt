@@ -37,5 +37,4 @@ class MainActivity : AppCompatActivity() {
     fun stopTimer() {
         binding.timer.stop()
     }
-
 }

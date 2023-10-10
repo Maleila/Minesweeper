@@ -21,8 +21,7 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
     private var bitmapImg = BitmapFactory.decodeResource(resources, R.drawable.mine)
     private var bitmapFlag = BitmapFactory.decodeResource(resources, R.drawable.flag)
     private val paintText = Paint()
-    private var lock = false
-
+    private var lock = false //used to disable the user from clicking the board after the game is over
 
     init{
         paintBackground.color = Color.BLACK
@@ -51,19 +50,16 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
 
         drawBoard(canvas)
 
-        drawMine(canvas)
+        drawTiles(canvas)
     }
 
-    //rename this
-    fun drawMine(canvas: Canvas?) {
-        for (i in 0..4) { //go back and change this later so it's not hard-coded
+    private fun drawTiles(canvas: Canvas?) {
+        for (i in 0..4) {
             for (j in 0..4) {
                 if (MinesweeperModel.getField(i, j).type == MinesweeperModel.MINE && MinesweeperModel.getField(i, j).wasClicked) {
                     canvas?.drawBitmap(bitmapImg, i*height/5f, j*width/5f, null)
                 } else if(MinesweeperModel.getField(i, j).type == MinesweeperModel.CLEAR && MinesweeperModel.getField(i, j).wasClicked){
                     centerNumber(canvas, i, j)
-                //var num = MinesweeperModel.getField(i, j).minesAround
-                    //canvas?.drawText("$num", i*height/5f, (j+1)*width/5f, paintText)
                 } else if(MinesweeperModel.getField(i, j).isFlagged) {
                     canvas?.drawBitmap(bitmapFlag, i*height/5f, j*width/5f, null)
                 }
@@ -71,7 +67,7 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
         }
     }
 
-    fun centerNumber(canvas: Canvas?, i: Int, j: Int) {
+    private fun centerNumber(canvas: Canvas?, i: Int, j: Int) {
         var num = MinesweeperModel.getField(i, j).minesAround
         val offsetY = (height/5f - (paintText.ascent() + paintText.descent()))/2f
         val offsetX = (width/5f - paintText.measureText("$num"))/2f
@@ -99,10 +95,8 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
                 if(!MinesweeperModel.flag(tX, tY)) {
                     loseGame()
                 }
-            } else {
-                if(MinesweeperModel.testSquare(tX, tY)) {
+            } else if(MinesweeperModel.testMine(tX, tY)) {
                     loseGame()
-                }
             }
             if(MinesweeperModel.checkWin()) {
                 winGame()
@@ -122,14 +116,14 @@ class MinesweeperView(context: Context?, attrs: AttributeSet?) : View(context, a
     fun resetGame() {
         MinesweeperModel.resetModel()
         (context as MainActivity).resetCB()
-        lock = false
         (context as MainActivity).resetTimer()
+        lock = false
         invalidate()
     }
 
     private fun loseGame() {
-        for(i in 0..3) { //change this so it's not hard-coded
-            MinesweeperModel.getField(MinesweeperModel.minesList[i][0], MinesweeperModel.minesList[i][1]).setClicked(true)
+        for(i in 0..2) {
+            MinesweeperModel.getField(MinesweeperModel.minesList[i][0], MinesweeperModel.minesList[i][1]).setClicked()
         }
         lock = true
         (context as MainActivity).stopTimer()
